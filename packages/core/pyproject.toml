@@ -15,7 +15,7 @@ api = [
 ]
 telegram = [
   "telethon>=1.37,<2",
-  "cryptography>=43,<46",
+  "cryptography>=43,<50",
 ]
 test = [
   "pytest>=8.3,<9",
