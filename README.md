@@ -142,7 +142,7 @@ Heartbeat never receives more permissions than interactive messages. It should i
 
 ## Remote dashboard deployment
 
-Do **not** expose the development server, FastAPI port, Redis or PostgreSQL directly to the internet. Password entry over `http://IP:port` is deliberately unsupported.
+Do **not** expose the development server, FastAPI port, Redis or PostgreSQL directly to the internet. The no-domain IP mode below uses plain HTTP because it is designed for the requested simple setup; use it only from a trusted network. For public internet access, use the domain deployment with TLS.
 
 ### External access without a domain
 
@@ -153,7 +153,7 @@ cd /root/igoragent
 ./scripts/start-ip.sh
 ```
 
-The launcher automatically detects the server public IPv4 address, creates or updates protected `.env` values, starts Caddy, and prints a one-time setup link of the form `https://<server-ip>/#setup-token=...` followed by **“Continue setup in the dashboard.”** Open that exact link once. The token is in the URL fragment, so it is not sent to Caddy or the API; the dashboard removes it from the address bar and uses it only in the first password-setup request. Treat the link as a password and do not share it.
+The launcher automatically detects the server public IPv4 address, creates or updates protected `.env` values, starts Caddy, and prints a one-time setup link of the form `http://<server-ip>/#setup-token=...` followed by **“Continue setup in the dashboard.”** Open that exact link once. The token is in the URL fragment, so it is not sent to Caddy or the API; the dashboard removes it from the address bar and uses it only in the first password-setup request. Treat the link as a password and do not share it.
 
 If public-IP detection is unavailable because the server is behind NAT or outbound HTTPS is restricted, provide the externally reachable IPv4 explicitly:
 
@@ -161,7 +161,7 @@ If public-IP detection is unavailable because the server is behind NAT or outbou
 IGORAGENT_PUBLIC_IP=<server-ip> ./scripts/start-ip.sh
 ```
 
-Caddy issues an internal certificate in this mode. The browser will display a certificate warning on the first visit; verify it is your server and explicitly trust the certificate before entering the dashboard password. Later visits use `https://<server-ip>` normally. Only port 443 is published; API, Redis and PostgreSQL remain on a Docker-internal network.
+The IP launcher exposes only port **80**; API, Redis and PostgreSQL remain on a Docker-internal network. HTTP does not encrypt the dashboard password, setup traffic, session cookie, or configuration while in transit. Run this mode only on a network you trust. For an internet-facing dashboard, configure the optional domain deployment below so Caddy provides public TLS.
 
 ### Optional domain with public TLS
 
@@ -186,7 +186,7 @@ chmod +x scripts/start-ip.sh
 ./scripts/start-ip.sh
 ```
 
-After the containers start, the script prints a public dashboard address and a one-time setup link. Open the setup link in a browser, verify the server address, trust the internal HTTPS certificate, create a dashboard password, and continue onboarding.
+After the containers start, the script prints a public HTTP dashboard address and a one-time setup link. Open the setup link in a browser, create a dashboard password, and continue onboarding. Use this HTTP mode only from a trusted network; use the optional domain deployment for public TLS.
 
 The one-time link contains a token after `#`. It is used only to create the first password, is removed from the browser address bar immediately, and must not be shared.
 

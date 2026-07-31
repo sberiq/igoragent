@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta, timezone
 
+from starlette.responses import Response
+
+import main
 from auth import AuthService
 
 
@@ -48,3 +51,15 @@ def test_login_rate_limit_blocks_after_five_failures() -> None:
     for _ in range(5):
         assert auth.login("wrong password", "client") is None
     assert auth.login("correct horse battery staple", "client") is None
+
+
+def test_session_cookie_matches_configured_transport(monkeypatch) -> None:
+    insecure_response = Response()
+    monkeypatch.setattr(main, "COOKIE_SECURE", False)
+    main.set_session_cookie(insecure_response, "session")
+    assert "Secure" not in insecure_response.headers["set-cookie"]
+
+    secure_response = Response()
+    monkeypatch.setattr(main, "COOKIE_SECURE", True)
+    main.set_session_cookie(secure_response, "session")
+    assert "Secure" in secure_response.headers["set-cookie"]

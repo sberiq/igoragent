@@ -3,7 +3,7 @@ services:
     image: caddy:2.8-alpine
     restart: unless-stopped
     ports:
-      - "443:443"
+      - "80:80"
     volumes:
       - ./Caddyfile.ip:/etc/caddy/Caddyfile:ro
       - caddy-ip-data:/data
@@ -35,8 +35,8 @@ services:
     env_file: ../.env
     environment:
       IGORAGENT_LOCAL_MODE: "false"
-      IGORAGENT_COOKIE_SECURE: "true"
-      IGORAGENT_ALLOWED_ORIGINS: https://${IGORAGENT_PUBLIC_IP}
+      IGORAGENT_COOKIE_SECURE: "false"
+      IGORAGENT_ALLOWED_ORIGINS: http://${IGORAGENT_PUBLIC_IP}
       IGORAGENT_CONFIG_PATH: /var/lib/igoragent/configuration.json
       TELEGRAM_SESSION_PATH: /var/lib/igoragent/telegram.session
     volumes:

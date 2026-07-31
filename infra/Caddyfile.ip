@@ -1,5 +1,4 @@
-:443 {
-    tls internal
+:80 {
     encode zstd gzip
 
     header {
@@ -11,7 +10,7 @@
 
     reverse_proxy web:3000 {
         header_up Host {host}
-        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Proto http
         header_up X-Forwarded-For {remote_host}
     }
 }

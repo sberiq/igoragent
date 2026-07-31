@@ -32,7 +32,7 @@ EOF
 fi
 
 cd "$PROJECT_DIR"
-docker compose -f infra/docker-compose.local.yml up --build -d
+docker compose --env-file "$ENV_FILE" -f infra/docker-compose.local.yml up --build -d
 
 printf '\nIgorAgent is starting. Open: http://localhost:3000\n'
 printf 'On the first visit, create the dashboard password and complete onboarding.\n'

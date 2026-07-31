@@ -39,7 +39,7 @@ then
   exit 1
 fi
 
-printf 'Public dashboard address: https://%s\n' "$public_ip"
+printf 'Public dashboard address: http://%s\n' "$public_ip"
 
 setup_token="$(python3 - "$ENV_FILE" "$public_ip" <<'PY'
 from pathlib import Path
@@ -63,7 +63,7 @@ values.update({
     "DATABASE_URL": f"postgresql+psycopg://igoragent:{db_password}@postgres:5432/igoragent",
     "REDIS_URL": "redis://redis:6379/0",
     "IGORAGENT_LOCAL_MODE": "false",
-    "IGORAGENT_COOKIE_SECURE": "true",
+    "IGORAGENT_COOKIE_SECURE": "false",
     "IGORAGENT_SETUP_TOKEN": setup_token,
     "IGORAGENT_PUBLIC_IP": public_ip,
     "NEXT_PUBLIC_API_URL": "/api",
@@ -86,8 +86,8 @@ PY
 )"
 
 cd "$PROJECT_DIR"
-docker compose -f infra/docker-compose.ip.yml up --build -d
-printf '\nOpen this one-time setup link:\nhttps://%s/#setup-token=%s\n' "$public_ip" "$setup_token"
+docker compose --env-file "$ENV_FILE" -f infra/docker-compose.ip.yml up --build -d
+printf '\nOpen this one-time setup link and continue setup in the dashboard:\nhttp://%s/#setup-token=%s\n' "$public_ip" "$setup_token"
 printf 'The token stays after #, so the browser does not send it to Caddy or the API. Treat this link like a password.\n'
-printf 'Your browser will warn about Caddy internal TLS on the first visit. Inspect and trust the certificate to continue.\n'
-printf 'Create the dashboard password and complete onboarding. Later visits use https://%s without the token.\n' "$public_ip"
+printf 'This IP mode uses plain HTTP. Use it only from a trusted network; use the domain deployment for public TLS.\n'
+printf 'Later visits use http://%s without the token.\n' "$public_ip"
