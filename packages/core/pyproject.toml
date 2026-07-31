@@ -18,7 +18,7 @@ telegram = [
   "cryptography>=43,<46",
 ]
 test = [
-  "pytest>=8.3,<9",
+  "pytest>=8.3,<10",
   "httpx>=0.28,<1",
 ]
 
