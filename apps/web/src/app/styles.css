@@ -1,0 +1,34 @@
+:root {
+  color-scheme: dark;
+  --canvas: #10141a;
+  --surface: #171d25;
+  --border: #314052;
+  --ink: #edf3fb;
+  --muted: #a7b5c8;
+  --accent: #7ac9ff;
+  --accent-ink: #06131f;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: Arial, sans-serif; }
+main { max-width: 1000px; margin: 0 auto; padding: 56px 24px; }
+header { display: flex; justify-content: space-between; gap: 24px; align-items: start; margin-bottom: 36px; }
+h1 { max-width: 700px; font-size: clamp(2rem, 5vw, 4.5rem); margin: 8px 0; letter-spacing: -0.05em; }
+h2 { margin-top: 0; }
+.eyebrow, .hint, .status { color: var(--muted); font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; }
+form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.wizard-card { max-width: 680px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; }
+.steps { display: flex; gap: 12px; padding: 0; margin: 0 0 28px; list-style: none; color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; }
+.steps li { border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px; }
+.steps li.active { color: var(--accent); border-color: var(--accent); }
+.wizard-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+.wizard-actions button { flex: 1; }
+button.secondary { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+.connected { padding: 14px; color: var(--ink); border: 1px solid var(--accent); border-radius: 8px; }
+dl { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; } dt { color: var(--muted); } dd { margin: 0; }
+@media (max-width: 760px) { .steps { flex-wrap: wrap; } .wizard-actions { flex-direction: column; } }
+section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+label { display: grid; gap: 8px; margin-top: 16px; color: var(--muted); }
+select, input, button { border-radius: 8px; border: 1px solid var(--border); background: var(--canvas); color: var(--ink); padding: 10px 12px; font: inherit; }
+button { grid-column: 1 / -1; background: var(--accent); color: var(--accent-ink); border: 0; font-weight: 700; cursor: pointer; }
+@media (max-width: 760px) { header { display: block; } form { grid-template-columns: 1fr; } }

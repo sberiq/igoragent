@@ -1,0 +1,98 @@
+services:
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ./Caddyfile.ip:/etc/caddy/Caddyfile:ro
+      - caddy-ip-data:/data
+      - caddy-ip-config:/config
+    depends_on:
+      - web
+    networks:
+      - public
+      - internal
+
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: /api
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - internal
+
+  api:
+    build:
+      context: ..
+      dockerfile: infra/api.Dockerfile
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      IGORAGENT_LOCAL_MODE: "false"
+      IGORAGENT_COOKIE_SECURE: "true"
+      IGORAGENT_ALLOWED_ORIGINS: https://${IGORAGENT_PUBLIC_IP}
+      IGORAGENT_CONFIG_PATH: /var/lib/igoragent/configuration.json
+      TELEGRAM_SESSION_PATH: /var/lib/igoragent/telegram.session
+    volumes:
+      - igoragent-ip-state:/var/lib/igoragent
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: igoragent
+      POSTGRES_USER: igoragent
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-ip-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U igoragent -d igoragent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis-ip-data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  public:
+  internal:
+    internal: true
+
+volumes:
+  caddy-ip-data:
+  caddy-ip-config:
+  igoragent-ip-state:
+  postgres-ip-data:
+  redis-ip-data:

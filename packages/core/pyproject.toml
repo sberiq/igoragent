@@ -1,0 +1,27 @@
+[project]
+name = "igoragent-core"
+version = "0.1.0"
+description = "Policy-bounded Telegram AI agent runtime"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.10,<3",
+]
+
+[project.optional-dependencies]
+api = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.32,<1",
+  "argon2-cffi>=23.1,<26",
+]
+telegram = [
+  "telethon>=1.37,<2",
+  "cryptography>=43,<46",
+]
+test = [
+  "pytest>=8.3,<9",
+  "httpx>=0.28,<1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

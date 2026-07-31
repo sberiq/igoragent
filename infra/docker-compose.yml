@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: igoragent
+      POSTGRES_USER: igoragent
+      POSTGRES_PASSWORD: igoragent
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    image: python:3.12-slim
+    working_dir: /workspace/apps/api
+    command: sh -c "pip install -e ../../packages/core[api] && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ..:/workspace
+    env_file: ../.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+
+  web:
+    image: node:22-alpine
+    working_dir: /workspace/apps/web
+    command: sh -c "npm install && npm run dev -- --hostname 0.0.0.0"
+    volumes:
+      - ..:/workspace
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  postgres-data:
